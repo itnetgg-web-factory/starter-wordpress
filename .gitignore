@@ -1,0 +1,55 @@
+# Ce dépôt ne versionne que le code développé pour le site :
+# thème, extensions et mu-plugins maison. Le cœur WordPress, la base,
+# les médias et les secrets restent hors de Git.
+
+# Système
+.DS_Store
+._*
+Thumbs.db
+
+# Éditeurs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Cœur WordPress et configuration (ancrés à la racine pour ne pas
+# exclure les index.php des thèmes et extensions)
+/wp-admin/
+/wp-includes/
+/wp-*.php
+/xmlrpc.php
+/index.php
+/license.txt
+/readme.html
+/wp-config.php
+
+# Contenus et données du client
+/uploads/
+/wp-content/uploads/
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz
+/backups/
+
+# Caches
+/cache/
+/wp-content/cache/
+/upgrade/
+
+# Dépendances et builds
+node_modules/
+vendor/
+build/
+*.log
+
+# Secrets : jamais dans Git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+auth.json
+
+# Claude Code (réglages locaux)
+.claude/settings.local.json
