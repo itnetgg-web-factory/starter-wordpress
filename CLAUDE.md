@@ -10,3 +10,8 @@ Modèle public de la filière WordPress + Gutenberg. N'y écrire aucune informat
 - Un déploiement de code ne doit pas écraser les contenus, médias ou extensions gérés par le client.
 - Novamira sert uniquement en développement et préproduction. Ne jamais l'installer ni l'utiliser sur un site client en production.
 - Respecter les standards de code WordPress (indentation par tabulations en PHP).
+
+## Standards et Skills
+
+- Standards à appliquer : https://github.com/itnetgg-web-factory/socle/tree/main/standards
+- Skill Claude Code de la filière : `site-wordpress` ; livraison : `site-delivery`.
