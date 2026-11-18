@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.9/theme.json",
+  "version": 3,
+  "slug": "section-principale",
+  "title": "Section couleur principale",
+  "blockTypes": ["core/group", "core/columns", "core/column"],
+  "styles": {
+    "color": {
+      "background": "var:preset|color|primary",
+      "text": "var:preset|color|base"
+    },
+    "elements": {
+      "link": {
+        "color": { "text": "var:preset|color|base" },
+        ":hover": { "color": { "text": "var:preset|color|accent" } }
+      },
+      "button": {
+        "color": {
+          "background": "var:preset|color|base",
+          "text": "var:preset|color|primary"
+        },
+        ":hover": {
+          "color": {
+            "background": "var:preset|color|accent",
+            "text": "var:preset|color|contrast"
+          }
+        }
+      }
+    },
+    "blocks": {
+      "core/quote": {
+        "elements": { "cite": { "color": { "text": "var:preset|color|base" } } }
+      }
+    }
+  }
+}
