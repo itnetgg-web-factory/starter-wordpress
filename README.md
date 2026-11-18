@@ -2,7 +2,7 @@
 
 Modèle de la **filière A** de l'usine `itnetgg-web-factory` : WordPress + Gutenberg, blocs personnalisés, hébergement o2switch, déploiement du code via GitHub Actions.
 
-> État : conventions posées (Phase 0). Le thème et les blocs arrivent aux blocs WordPress 2/3 et 3/3.
+> État : thème blocs `webfactory-blocks` et compositions métier (WordPress 2/3). Formulaire de contact maison et déploiement GitHub Actions à venir (WordPress 3/3).
 
 ## Pour qui
 
@@ -13,8 +13,8 @@ Sites où le client veut modifier lui-même ses mises en page, blogs à plusieur
 | Composant | Choix |
 |---|---|
 | CMS | WordPress |
-| Éditeur | Gutenberg + blocs personnalisés |
-| Thème | À trancher : thème basé sur les blocs ou Astra |
+| Éditeur | Gutenberg, compositions métier, blocs maison si nécessaire |
+| Thème | [`webfactory-blocks`](themes/webfactory-blocks/README.md), thème blocs autonome |
 | Assistance IA | Novamira, **uniquement en développement et préproduction**, jamais sur un site client en production |
 | Hébergement | o2switch (préproduction), hébergement du client (production) |
 | CI/CD | GitHub Actions, déploiement SSH/SFTP |
@@ -29,13 +29,17 @@ Sites où le client veut modifier lui-même ses mises en page, blogs à plusieur
 
 Un déploiement de code ne doit jamais écraser les contenus, médias ou extensions gérés par le client.
 
-## Structure prévue
+## Structure
 
 ```
-themes/<theme>/      thème du site
-plugins/<extension>/ extensions maison (blocs personnalisés)
-mu-plugins/          réglages imposés
+themes/webfactory-blocks/  thème du site (voir son README)
+plugins/<extension>/       extensions maison (blocs personnalisés), à venir
+mu-plugins/                réglages imposés, à venir
 ```
+
+## Extensions
+
+Un site démarre sans extension tierce. Chaque ajout est justifié (besoin, coût, maintenance, alternative native). Prévu par défaut : une extension SEO légère. Novamira uniquement en développement et préproduction.
 
 ## Créer un projet client depuis ce modèle
 

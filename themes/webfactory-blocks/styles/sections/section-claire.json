@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.9/theme.json",
+  "version": 3,
+  "slug": "section-claire",
+  "title": "Section claire",
+  "blockTypes": ["core/group", "core/columns", "core/column"],
+  "styles": {
+    "color": {
+      "background": "var:preset|color|surface",
+      "text": "var:preset|color|contrast"
+    }
+  }
+}
