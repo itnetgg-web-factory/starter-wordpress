@@ -17,7 +17,7 @@ Sites où le client veut modifier lui-même ses mises en page, blogs à plusieur
 | Thème | [`webfactory-blocks`](themes/webfactory-blocks/README.md), thème blocs autonome |
 | Assistance IA | Novamira, **uniquement en développement et préproduction**, jamais sur un site client en production |
 | Hébergement | o2switch (préproduction), hébergement du client (production) |
-| CI/CD | GitHub Actions, déploiement SSH/SFTP |
+| CI/CD | GitHub Actions, déploiement FTPS (SSH fermé aux runners chez o2switch) |
 
 ## Ce qui est versionné, ce qui ne l'est pas
 
@@ -35,6 +35,7 @@ Un déploiement de code ne doit jamais écraser les contenus, médias ou extensi
 themes/webfactory-blocks/        thème du site (voir son README)
 plugins/webfactory-formulaire/   bloc « Formulaire de contact » (voir son README)
 mu-plugins/webfactory-smtp.php   envoi des e-mails par SMTP, configuré dans wp-config.php
+mu-plugins/webfactory-deploiement.php  vidage du cache des compositions après déploiement
 docs/deploiement.md              déploiement par GitHub Actions
 ```
 

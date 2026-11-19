@@ -1,6 +1,8 @@
 # Déploiement du code par GitHub Actions
 
-Le job `deploy` de `.github/workflows/ci.yml` publie **le code maison** sur le WordPress de préproduction après chaque fusion dans `main`.
+Le job `deploy` de `.github/workflows/ci.yml` publie **le code maison** sur le WordPress de préproduction après chaque fusion dans `main`, en **FTPS** (FTP chiffré par TLS, certificat vérifié).
+
+Pourquoi pas SSH : o2switch filtre SSH par adresse IP et les adresses des runners GitHub varient (connexion refusée, constaté le 19/11/2026). FTPS passe, avec un compte FTP limité au dossier `wp-content` du site : il ne voit ni la base, ni `wp-config.php`, ni le reste de l'hébergement.
 
 ## Ce qui est déployé, ce qui ne l'est jamais
 
@@ -16,10 +18,9 @@ Une composition insérée dans une page est copiée dans la base : déployer une
 ## Étapes du job
 
 1. Attente des contrôles communs (format, secrets).
-2. Connexion SSH avec une clé réservée au déploiement ; empreinte du serveur vérifiée (`StrictHostKeyChecking yes`).
-3. `rsync --delete` de chaque dossier de code maison, droits 755/644, sans les fichiers Markdown.
-4. Vidage du cache des compositions de WordPress (sinon les compositions modifiées n'apparaissent qu'au changement de version du thème).
-5. Vérification : accueil en HTTP 200 et feuille de style du thème servie dans la version du dépôt.
+2. `lftp mirror -R --delete` de chaque dossier de code maison, sans les fichiers Markdown ; envoi des fichiers maison de `mu-plugins/` sans suppression des autres.
+3. Dépôt d'un témoin `wp-content/webfactory-deploiement.txt` (commit et date). Le mu-plugin `webfactory-deploiement` le détecte à la requête suivante et vide le cache des compositions (sinon les compositions modifiées n'apparaissent qu'au changement de version du thème).
+4. Vérification : accueil en HTTP 200 et feuille de style du thème servie dans la version du dépôt (jusqu'à 6 essais espacés de 15 s).
 
 Les fichiers PHP sont relus par OPcache au plus 60 s après le déploiement.
 
@@ -27,21 +28,18 @@ Les fichiers PHP sont relus par OPcache au plus 60 s après le déploiement.
 
 | Nom | Type | Contenu |
 |---|---|---|
-| `SSH_PRIVATE_KEY` | Secret | Clé privée de déploiement (ed25519, sans phrase de passe), propre au site |
-| `SSH_HOST` | Variable | Serveur SSH de l'hébergement |
-| `SSH_USER` | Variable | Compte SSH |
-| `SSH_KNOWN_HOSTS` | Variable | Ligne `known_hosts` du serveur (`ssh-keyscan -t ed25519 <serveur>`), empreinte contrôlée à la main |
-| `WP_PATH` | Variable | Chemin absolu de l'installation WordPress |
+| `FTP_PASSWORD` | Secret | Mot de passe du compte FTP de déploiement (créé et saisi par Gérard) |
+| `FTP_HOST` | Variable | Serveur FTP, nom couvert par son certificat TLS (chez o2switch : le nom du serveur, par exemple `<serveur>.o2switch.net`) |
+| `FTP_USER` | Variable | Compte FTP de déploiement, par exemple `deploiement@<domaine>` |
 | `PUBLIC_SITE_URL` | Variable | Adresse publique du site, sans `/` final |
 
-La clé publique de déploiement est importée puis **autorisée** dans cPanel (Accès SSH > Gérer les clés SSH).
+Le compte FTP est créé dans cPanel (Comptes FTP), avec pour répertoire le dossier `wp-content` du site et un mot de passe fort.
 
 ## Premier déploiement d'un site
 
-1. Générer la clé : `ssh-keygen -t ed25519 -N "" -C "github-actions <site> deploiement" -f deploy_<site>`.
-2. Importer et autoriser `deploy_<site>.pub` dans cPanel.
-3. Créer le secret (par Gérard) : `gh secret set SSH_PRIVATE_KEY --env staging -R <dépôt> < deploy_<site>`, puis supprimer la clé privée locale.
-4. Créer les variables, limiter `staging` à `main`.
+1. Créer le compte FTP de déploiement dans cPanel, limité au dossier `wp-content` du site (par Gérard).
+2. Créer le secret (par Gérard) : `gh secret set FTP_PASSWORD --env staging -R <dépôt>`, mot de passe saisi au clavier.
+3. Créer les variables, limiter `staging` à `main`.
 5. Activer sur le site les extensions maison déployées (une seule fois).
 6. Fusionner une pull request : le déploiement part automatiquement.
 
