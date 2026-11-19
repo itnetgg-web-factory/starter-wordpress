@@ -13,6 +13,8 @@ jobs:
     uses: itnetgg-web-factory/socle/.github/workflows/controles.yml@v0.1.0
 
   # Déploiement du code maison (thèmes, extensions, mu-plugins) après chaque fusion dans main.
+  # Transport FTPS : o2switch n'ouvre pas SSH aux runners GitHub (adresses variables).
+  # Le compte FTP est limité au dossier wp-content du site.
   # Ne touche jamais à la base, à uploads/, au cœur WordPress ni aux extensions installées par le client.
   # Identifiants dans l'environnement GitHub « staging », limité à la branche main.
   deploy:
@@ -27,65 +29,58 @@ jobs:
       group: deploiement-staging
       cancel-in-progress: false
     env:
-      SSH_HOST: ${{ vars.SSH_HOST }}
-      SSH_USER: ${{ vars.SSH_USER }}
-      WP_PATH: ${{ vars.WP_PATH }}
+      FTP_HOST: ${{ vars.FTP_HOST }}
+      FTP_USER: ${{ vars.FTP_USER }}
       PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Préparer la connexion SSH
+      - name: Installer lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Publier le code maison (FTPS)
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploiement
-          chmod 600 ~/.ssh/deploiement
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # Témoin lu par le mu-plugin webfactory-deploiement : il vide le cache des compositions.
+          echo "$GITHUB_SHA $(date -u +%Y-%m-%dT%H:%M:%SZ)" > webfactory-deploiement.txt
           {
-            echo "Host cible"
-            echo "  HostName $SSH_HOST"
-            echo "  User $SSH_USER"
-            echo "  IdentityFile ~/.ssh/deploiement"
-            echo "  IdentitiesOnly yes"
-            echo "  StrictHostKeyChecking yes"
-            echo "  ConnectTimeout 20"
-          } > ~/.ssh/config
-          ssh cible 'echo "Connexion SSH établie"'
-
-      - name: Publier le code maison
-        run: |
-          DEST="$WP_PATH/wp-content"
-          OPTIONS=(-rlz --delete --chmod=D755,F644 --exclude='*.md' --exclude='.DS_Store')
-          # Chaque thème et chaque extension maison est synchronisé dans son propre dossier :
-          # les autres thèmes et extensions du site restent intacts.
-          for dossier in themes/*/ plugins/*/; do
-            [ -d "$dossier" ] || continue
-            echo "→ $dossier"
-            rsync "${OPTIONS[@]}" "$dossier" "cible:$DEST/$dossier"
-          done
-          # mu-plugins : fichiers maison uniquement, sans suppression des autres.
-          if compgen -G "mu-plugins/*.php" > /dev/null; then
-            ssh cible "mkdir -p '$DEST/mu-plugins'"
-            rsync -lz --chmod=F644 mu-plugins/*.php "cible:$DEST/mu-plugins/"
-          fi
-
-      - name: Vider le cache des compositions
-        run: |
-          ssh cible "cd '$WP_PATH' && wp eval 'foreach ( wp_get_themes() as \$theme ) { \$theme->delete_pattern_cache(); } echo \"Cache des compositions vidé\";'"
+            echo "set ftp:ssl-force true"
+            echo "set ftp:ssl-protect-data true"
+            echo "set ssl:verify-certificate true"
+            echo "set ftp:passive-mode true"
+            echo "set net:timeout 30"
+            echo "set net:max-retries 2"
+            echo "open --env-password -u \"$FTP_USER\" \"ftp://$FTP_HOST\""
+            # Chaque thème et chaque extension maison est synchronisé dans son propre dossier :
+            # les autres thèmes et extensions du site restent intacts.
+            for dossier in themes/*/ plugins/*/; do
+              [ -d "$dossier" ] || continue
+              echo "mirror -R --delete --no-perms --verbose=1 --exclude-glob *.md --exclude-glob .DS_Store ${dossier%/} ${dossier%/}"
+            done
+            # mu-plugins : fichiers maison uniquement, sans suppression des autres.
+            echo "mkdir -p -f mu-plugins"
+            for fichier in mu-plugins/*.php; do
+              [ -f "$fichier" ] && echo "put -O mu-plugins $fichier"
+            done
+            echo "put webfactory-deploiement.txt"
+          } > deploiement.lftp
+          lftp -f deploiement.lftp
+          rm -f deploiement.lftp
 
       - name: Vérifier le site
         run: |
-          code=$(curl -s -o /dev/null -w '%{http_code}' "$PUBLIC_SITE_URL/")
-          echo "Accueil : HTTP $code"
-          test "$code" = "200"
           version=$(sed -n 's/^Version: *//p' themes/webfactory-blocks/style.css)
-          curl -s "$PUBLIC_SITE_URL/" | grep -q "webfactory-blocks/style.css?ver=$version"
-          echo "Thème webfactory-blocks $version en ligne"
-
-      - name: Nettoyer la clé
-        if: always()
-        run: rm -f ~/.ssh/deploiement
+          for essai in 1 2 3 4 5 6; do
+            page=$(curl -s -w '\n%{http_code}' "$PUBLIC_SITE_URL/?deploiement=$GITHUB_SHA")
+            code=$(echo "$page" | tail -n 1)
+            if [ "$code" = "200" ] && echo "$page" | grep -q "webfactory-blocks/style.css?ver=$version"; then
+              echo "Accueil : HTTP 200, thème webfactory-blocks $version en ligne"
+              exit 0
+            fi
+            echo "Essai $essai : HTTP $code, version $version pas encore servie ; nouvel essai dans 15 s"
+            sleep 15
+          done
+          exit 1
