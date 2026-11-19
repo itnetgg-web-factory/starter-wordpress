@@ -1,0 +1,71 @@
+/* Formulaire de contact : mise en forme alignée sur les réglages du thème. */
+.wp-block-webfactory-formulaire-contact form {
+  display: grid;
+  gap: 1rem;
+}
+
+.webfactory-formulaire__champ {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.webfactory-formulaire__champ label {
+  font-weight: 600;
+}
+
+.webfactory-formulaire__champ input,
+.webfactory-formulaire__champ textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--wp--preset--color--muted, #4b5563);
+  border-radius: 6px;
+  background: var(--wp--preset--color--base, #fff);
+  color: var(--wp--preset--color--contrast, #1b1f24);
+  font: inherit;
+}
+
+.webfactory-formulaire__champ [aria-invalid="true"] {
+  border-color: #b3261e;
+  border-width: 2px;
+}
+
+.webfactory-formulaire__aide,
+.webfactory-formulaire__obligatoire,
+.webfactory-formulaire__mention {
+  font-size: var(--wp--preset--font-size--small, 0.9375rem);
+}
+
+.webfactory-formulaire__erreur-champ {
+  color: #b3261e;
+  font-size: var(--wp--preset--font-size--small, 0.9375rem);
+  font-weight: 600;
+}
+
+.webfactory-formulaire__message {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+
+.webfactory-formulaire__message--succes {
+  border-color: #1e7b34;
+  background: #e8f5ec;
+  color: #14532d;
+}
+
+.webfactory-formulaire__message--erreur {
+  border-color: #b3261e;
+  background: #fdecea;
+  color: #7f1d1d;
+}
+
+/* Champ piège pour les robots : hors écran, ignoré par les lecteurs d'écran. */
+.webfactory-formulaire__piege {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

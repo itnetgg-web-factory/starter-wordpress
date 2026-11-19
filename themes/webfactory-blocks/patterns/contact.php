@@ -4,7 +4,7 @@
  * Slug: webfactory-blocks/contact
  * Categories: webfactory, contact
  * Keywords: contact, coordonnées, adresse, téléphone, e-mail, formulaire
- * Description: Coordonnées (adresse, téléphone, e-mail, horaires) et zone de prise de contact.
+ * Description: Coordonnées (adresse, téléphone, e-mail, horaires) et formulaire de contact (extension Webfactory Formulaire).
  * Viewport Width: 1400
  *
  * @package webfactory-blocks
@@ -42,13 +42,7 @@
 <!-- wp:paragraph -->
 <p>Décrivez votre projet en quelques lignes : nous vous répondons sous deux jours ouvrés.</p>
 <!-- /wp:paragraph -->
-<!-- wp:buttons -->
-<div class="wp-block-buttons">
-<!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="mailto:contact@example.com">Envoyer un e-mail</a></div>
-<!-- /wp:button -->
-</div>
-<!-- /wp:buttons -->
+<!-- wp:webfactory/formulaire-contact /-->
 </div>
 <!-- /wp:column -->
 </div>

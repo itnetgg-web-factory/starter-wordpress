@@ -2,7 +2,7 @@
 
 Modèle de la **filière A** de l'usine `itnetgg-web-factory` : WordPress + Gutenberg, blocs personnalisés, hébergement o2switch, déploiement du code via GitHub Actions.
 
-> État : thème blocs `webfactory-blocks` et compositions métier (WordPress 2/3). Formulaire de contact maison et déploiement GitHub Actions à venir (WordPress 3/3).
+> État : thème blocs `webfactory-blocks`, compositions métier, formulaire de contact maison, envoi SMTP et déploiement par GitHub Actions (WordPress 3/3).
 
 ## Pour qui
 
@@ -32,14 +32,28 @@ Un déploiement de code ne doit jamais écraser les contenus, médias ou extensi
 ## Structure
 
 ```
-themes/webfactory-blocks/  thème du site (voir son README)
-plugins/<extension>/       extensions maison (blocs personnalisés), à venir
-mu-plugins/                réglages imposés, à venir
+themes/webfactory-blocks/        thème du site (voir son README)
+plugins/webfactory-formulaire/   bloc « Formulaire de contact » (voir son README)
+mu-plugins/webfactory-smtp.php   envoi des e-mails par SMTP, configuré dans wp-config.php
+docs/deploiement.md              déploiement par GitHub Actions
 ```
 
 ## Extensions
 
-Un site démarre sans extension tierce. Chaque ajout est justifié (besoin, coût, maintenance, alternative native). Prévu par défaut : une extension SEO légère. Novamira uniquement en développement et préproduction.
+Un site démarre sans extension tierce. Chaque ajout est justifié (besoin, coût, maintenance, alternative native).
+
+| Extension | Origine | Rôle |
+|---|---|---|
+| Webfactory Formulaire | Maison (ce dépôt) | Formulaire de contact |
+| Webfactory SMTP (mu-plugin) | Maison (ce dépôt) | Envoi des e-mails par SMTP |
+| The SEO Framework | WordPress.org, installée sur le site | Descriptions, aperçus pour les réseaux sociaux, plan du site |
+| Novamira | Développement et préproduction uniquement | Accès de Claude Code ; jamais en production |
+
+Les extensions tierces ne sont pas versionnées : elles s'installent et se mettent à jour depuis WordPress.
+
+## Déploiement
+
+Après chaque fusion dans `main`, GitHub Actions publie le code maison sur la préproduction, sans toucher aux contenus. Voir [`docs/deploiement.md`](docs/deploiement.md).
 
 ## Créer un projet client depuis ce modèle
 

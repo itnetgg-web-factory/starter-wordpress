@@ -11,3 +11,81 @@ permissions:
 jobs:
   controles:
     uses: itnetgg-web-factory/socle/.github/workflows/controles.yml@v0.1.0
+
+  # Déploiement du code maison (thèmes, extensions, mu-plugins) après chaque fusion dans main.
+  # Ne touche jamais à la base, à uploads/, au cœur WordPress ni aux extensions installées par le client.
+  # Identifiants dans l'environnement GitHub « staging », limité à la branche main.
+  deploy:
+    name: Déploiement (préproduction)
+    needs: [controles]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.PUBLIC_SITE_URL }}
+    concurrency:
+      group: deploiement-staging
+      cancel-in-progress: false
+    env:
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_USER: ${{ vars.SSH_USER }}
+      WP_PATH: ${{ vars.WP_PATH }}
+      PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Préparer la connexion SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploiement
+          chmod 600 ~/.ssh/deploiement
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          {
+            echo "Host cible"
+            echo "  HostName $SSH_HOST"
+            echo "  User $SSH_USER"
+            echo "  IdentityFile ~/.ssh/deploiement"
+            echo "  IdentitiesOnly yes"
+            echo "  StrictHostKeyChecking yes"
+            echo "  ConnectTimeout 20"
+          } > ~/.ssh/config
+          ssh cible 'echo "Connexion SSH établie"'
+
+      - name: Publier le code maison
+        run: |
+          DEST="$WP_PATH/wp-content"
+          OPTIONS=(-rlz --delete --chmod=D755,F644 --exclude='*.md' --exclude='.DS_Store')
+          # Chaque thème et chaque extension maison est synchronisé dans son propre dossier :
+          # les autres thèmes et extensions du site restent intacts.
+          for dossier in themes/*/ plugins/*/; do
+            [ -d "$dossier" ] || continue
+            echo "→ $dossier"
+            rsync "${OPTIONS[@]}" "$dossier" "cible:$DEST/$dossier"
+          done
+          # mu-plugins : fichiers maison uniquement, sans suppression des autres.
+          if compgen -G "mu-plugins/*.php" > /dev/null; then
+            ssh cible "mkdir -p '$DEST/mu-plugins'"
+            rsync -lz --chmod=F644 mu-plugins/*.php "cible:$DEST/mu-plugins/"
+          fi
+
+      - name: Vider le cache des compositions
+        run: |
+          ssh cible "cd '$WP_PATH' && wp eval 'foreach ( wp_get_themes() as \$theme ) { \$theme->delete_pattern_cache(); } echo \"Cache des compositions vidé\";'"
+
+      - name: Vérifier le site
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$PUBLIC_SITE_URL/")
+          echo "Accueil : HTTP $code"
+          test "$code" = "200"
+          version=$(sed -n 's/^Version: *//p' themes/webfactory-blocks/style.css)
+          curl -s "$PUBLIC_SITE_URL/" | grep -q "webfactory-blocks/style.css?ver=$version"
+          echo "Thème webfactory-blocks $version en ligne"
+
+      - name: Nettoyer la clé
+        if: always()
+        run: rm -f ~/.ssh/deploiement

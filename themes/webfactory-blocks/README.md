@@ -33,5 +33,5 @@ Les sections s'ajoutent aussi une à une : bouton **+**, onglet **Compositions**
 ## Points d'attention
 
 - **Caches après déploiement** : WordPress met en cache la liste des compositions du thème selon son numéro de version, et OPcache revalide les fichiers PHP toutes les 60 s sur o2switch. Après un déploiement, incrémenter `Version` dans `style.css` ou vider le cache des compositions.
-- **Formulaire de contact** : la composition « Contact » propose un lien e-mail en attendant le bloc maison de formulaire.
+- **Formulaire de contact** : la composition « Contact » utilise le bloc de l'extension maison `webfactory-formulaire`, à activer sur chaque site.
 - **Pied de page** : liens vers `/mentions-legales/` et `/politique-de-confidentialite/`, pages à créer sur chaque site.
