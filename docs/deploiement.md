@@ -18,7 +18,7 @@ Une composition insérée dans une page est copiée dans la base : déployer une
 ## Étapes du job
 
 1. Attente des contrôles communs (format, secrets).
-2. `lftp mirror -R --delete` de chaque dossier de code maison, sans les fichiers Markdown ; envoi des fichiers maison de `mu-plugins/` sans suppression des autres.
+2. `lftp mirror -R --delete --overwrite` de chaque dossier de code maison, sans les fichiers Markdown ; envoi des fichiers maison de `mu-plugins/` sans suppression des autres. Chaque fichier est envoyé sous un nom provisoire (`.depot-*`) puis renommé : aucun fichier n'est absent pendant le déploiement. Un envoi interrompu laisse au pire un fichier provisoire, supprimé au déploiement suivant.
 3. Dépôt d'un témoin `wp-content/webfactory-deploiement.txt` (commit et date). Le mu-plugin `webfactory-deploiement` le détecte à la requête suivante et vide le cache des compositions (sinon les compositions modifiées n'apparaissent qu'au changement de version du thème).
 4. Vérification : accueil en HTTP 200 et feuille de style du thème servie dans la version du dépôt (jusqu'à 6 essais espacés de 15 s).
 

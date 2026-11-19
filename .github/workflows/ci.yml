@@ -53,12 +53,15 @@ jobs:
             echo "set ftp:passive-mode true"
             echo "set net:timeout 30"
             echo "set net:max-retries 2"
+            # Envoi sous un nom provisoire puis renommage : jamais de fichier absent pendant le déploiement.
+            echo "set xfer:use-temp-file true"
+            echo "set xfer:temp-file-name .depot-*"
             echo "open --env-password -u \"$FTP_USER\" \"ftp://$FTP_HOST\""
             # Chaque thème et chaque extension maison est synchronisé dans son propre dossier :
             # les autres thèmes et extensions du site restent intacts.
             for dossier in themes/*/ plugins/*/; do
               [ -d "$dossier" ] || continue
-              echo "mirror -R --delete --no-perms --verbose=1 --exclude-glob *.md --exclude-glob .DS_Store ${dossier%/} ${dossier%/}"
+              echo "mirror -R --delete --overwrite --no-perms --verbose=1 --exclude-glob *.md --exclude-glob .DS_Store ${dossier%/} ${dossier%/}"
             done
             # mu-plugins : fichiers maison uniquement, sans suppression des autres.
             echo "mkdir -p -f mu-plugins"
