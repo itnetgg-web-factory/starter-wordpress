@@ -52,6 +52,11 @@ Un site démarre sans extension tierce. Chaque ajout est justifié (besoin, coû
 
 Les extensions tierces ne sont pas versionnées : elles s'installent et se mettent à jour depuis WordPress.
 
+## Édition par le client
+
+- [Guide utilisateur](docs/guide-utilisateur.md) : à remettre au client (compte Éditeur), après avoir complété le contact du support. Modifier, dupliquer, publier, revenir en arrière, sans connaissance technique.
+- [Guide administrateur](docs/guide-administrateur.md) : pour le support. Rôles, circuit de déploiement, incidents, journaux, restauration, mises à jour.
+
 ## Déploiement
 
 Après chaque fusion dans `main`, GitHub Actions publie le code maison sur la préproduction, sans toucher aux contenus. Voir [`docs/deploiement.md`](docs/deploiement.md).
