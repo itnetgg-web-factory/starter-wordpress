@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "webfactory/formulaire-contact",
+  "title": "Formulaire de contact",
+  "category": "widgets",
+  "icon": "email",
+  "description": "Formulaire de contact accessible : nom, e-mail, téléphone, message. Les messages sont envoyés par e-mail, rien n'est conservé sur le site.",
+  "keywords": ["contact", "formulaire", "message", "devis"],
+  "textdomain": "webfactory-formulaire",
+  "attributes": {
+    "boutonTexte": {
+      "type": "string",
+      "default": "Envoyer le message"
+    },
+    "mention": {
+      "type": "string",
+      "default": "Vos informations servent uniquement à répondre à votre demande. Elles ne sont ni conservées sur le site ni transmises à des tiers."
+    }
+  },
+  "supports": {
+    "html": false,
+    "multiple": false,
+    "align": ["wide"],
+    "spacing": {
+      "margin": true
+    }
+  },
+  "editorScript": "file:./editor.js",
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}
