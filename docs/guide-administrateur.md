@@ -20,7 +20,7 @@ Un déploiement ne touche qu'à la première ligne. Une composition insérée da
 
 - **Client : rôle Éditeur**, jamais Administrateur. Il modifie pages, articles et médias, mais n'a accès ni aux extensions, ni aux thèmes, ni à l'éditeur de site, ni aux réglages. Cela protège le site et la mise en page.
 - **Support : rôle Administrateur**, compte nominatif, mot de passe fort rangé dans le coffre.
-- **Novamira** : uniquement en développement et préproduction, jamais sur un site client en production.
+- **Claude Code** : intervient par WP-CLI en SSH, avec une clé propre au compte d'hébergement du client. Aucune passerelle IA (Novamira, MCP) n'est installée sur le site.
 - Un compte qui n'a plus d'usage est supprimé, en réattribuant ses contenus à un autre compte.
 
 ## Comprendre le circuit d'une modification de code
