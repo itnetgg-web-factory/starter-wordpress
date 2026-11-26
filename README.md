@@ -15,7 +15,7 @@ Sites où le client veut modifier lui-même ses mises en page, blogs à plusieur
 | CMS | WordPress |
 | Éditeur | Gutenberg, compositions métier, blocs maison si nécessaire |
 | Thème | [`webfactory-blocks`](themes/webfactory-blocks/README.md), thème blocs autonome |
-| Assistance IA | Novamira, **uniquement en développement et préproduction**, jamais sur un site client en production |
+| Intervention de Claude Code | WP-CLI par SSH ; **aucune passerelle IA** (Novamira, MCP) installée sur le site |
 | Hébergement | o2switch (préproduction), hébergement du client (production) |
 | CI/CD | GitHub Actions, déploiement FTPS (SSH fermé aux runners chez o2switch) |
 
@@ -48,7 +48,6 @@ Un site démarre sans extension tierce. Chaque ajout est justifié (besoin, coû
 | Webfactory Formulaire | Maison (ce dépôt) | Formulaire de contact |
 | Webfactory SMTP (mu-plugin) | Maison (ce dépôt) | Envoi des e-mails par SMTP |
 | The SEO Framework | WordPress.org, installée sur le site | Descriptions, aperçus pour les réseaux sociaux, plan du site |
-| Novamira | Développement et préproduction uniquement | Accès de Claude Code ; jamais en production |
 
 Les extensions tierces ne sont pas versionnées : elles s'installent et se mettent à jour depuis WordPress.
 
