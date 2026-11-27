@@ -67,3 +67,7 @@ Voir la procédure dans [`socle`](https://github.com/itnetgg-web-factory/socle/b
 ## Conventions
 
 Voir [`socle/docs/conventions.md`](https://github.com/itnetgg-web-factory/socle/blob/main/docs/conventions.md).
+
+## Licence
+
+Code sous licence publique générale GNU, version 2 ou ultérieure (GPL-2.0-or-later), comme WordPress : voir [`LICENSE`](LICENSE). Les en-têtes du thème et des extensions le mentionnent déjà.
